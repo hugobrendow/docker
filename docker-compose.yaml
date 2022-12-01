@@ -1,0 +1,40 @@
+version: '3'
+services:
+  bacen:
+    build: ./bacen
+    networks:
+      - agronet
+    container_name: bacen
+    ports:
+      - 8091:8091
+  bank:
+    build: ./bank
+    networks:
+      - agronet
+    container_name: bank
+    ports:
+      - 8099:8099
+  prometheus:
+    build: ./prometheus
+    networks:
+      - agronet
+    container_name: prometheus
+    depends_on:
+      - bank
+      - bacen
+    ports:
+      - 9090:9090
+  grafana:
+    image: grafana/grafana
+    networks:
+      - agronet
+    container_name: grafana
+    environment:
+      - GF_SERVER_PROTOCOL=http
+      - GF_SERVER_HTTP_PORT=3000
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+networks:
+  agronet:
